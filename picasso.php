@@ -76,7 +76,7 @@ add_action('admin_action_picasso-delete-album',
 add_action('admin_post_picasso-upload-picture', 
   array(&$picasso, 'uploadPictureAction'));
   
-add_action('admin_action_picasso-upload-picture', 
+add_action('admin_post_nopriv_picasso-upload-picture', 
   array(&$picasso, 'uploadPictureAction'));
 /**
 *
