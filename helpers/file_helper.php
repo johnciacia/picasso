@@ -15,7 +15,9 @@ class FileHelper {
     //Is the MIME type valid?
     //wp_check_filetype()
     if(!in_array($_FILES['file']['type'], $types)) {
-      die("MIME type invalid");
+    	$file = getimagesize($_FILES['file']['type']);
+    	echo image_type_to_mime_type($file[2]);
+      die("<br />MIME type invalid");
       return false;
     }
      
@@ -70,13 +72,12 @@ class FileHelper {
   function createAlbum($album)
   {
     $name = md5($album);
-    $directory = WP_CONTENT_DIR . "/uploads/picasso/$album/";
+    $directory = WP_CONTENT_DIR . "/uploads/picasso/$name/";
     
     //@TODO - if $directory already exists, should we upload pictures there anyway? or return an error?
     //if(file_exists($directory))
     //  return false;
     
-    //@TODO - recursive directory creation does not work with mac/bsd
     return wp_mkdir_p($directory);
   
   }

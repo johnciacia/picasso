@@ -4,7 +4,7 @@
   } else {
     foreach($pictures as $picture) {
     
-      echo "<img src='" . WP_CONTENT_URL . "/picasso/$album/" . $picture->filename . "' width='100' height='100' /> ";
+      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/" . $picture->filename . "' width='100' height='100' /> ";
     
     }
   }

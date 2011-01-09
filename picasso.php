@@ -353,17 +353,17 @@ class Picasso {
   function uploadPictureAction()
   {
 
-    //$file = $this->fileHelper->upload(md5($_POST['album']));
-    //if($file === false) {
-    //  die("The picture failed to upload");
-    //}
+    $file = $this->fileHelper->upload(md5($_POST['album']));
+    if($file === false) {
+      die("The picture failed to upload");
+    }
     
     
     //@TODO - Create thumbnail
     //$this->fileHelper->createThumbnail($file);
     $data = array(
-      'filename' => 'test', //$file,
-      'aid' => 6//$_POST['aid']
+      'filename' => $file,
+      'aid' => $_POST['aid']
     );
     
     $picture = $this->picturesModel->addPicture($data);
@@ -371,7 +371,7 @@ class Picasso {
       die("The picture was not inserted into the database");
     }
     
-    //wp_redirect($_SERVER['HTTP_REFERER']);
+    wp_redirect($_SERVER['HTTP_REFERER']);
   }
 
   /**
@@ -424,7 +424,7 @@ class Picasso {
     
     foreach($pictures as $picture) {
       echo "<a rel='example_group' href='" . WP_CONTENT_URL . "/picasso/$album/$picture->filename'>";
-      echo "<img src='" . WP_CONTENT_URL . "/picasso/$album/$picture->filename' width='100' height='100' style='width:100px;height:100px;' /> ";
+      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/$picture->filename' width='100' height='100' style='width:100px;height:100px;' /> ";
       echo "</a>";
     }
     
