@@ -14,6 +14,10 @@
 	<div id="media-items" class="hide-if-no-js"> </div>
 	<ol id="log"></ol>
 </div>
+<?php
+	$siteurl = get_site_url() . "/wp-includes/js/swfupload/swfupload.swf";
+	$button = get_site_url() . '/wp-includes/images/upload.png?ver=20100531';
+?>
 <script type="text/javascript">
 //<![CDATA[
 var post_id;
@@ -25,10 +29,10 @@ SWFUpload.onload = function() {
 			button_height: "23",
 			button_width: "132",
 			button_text_top_padding: 3,
-			button_image_url: '../wp-includes/images/upload.png?ver=20100531',
+			button_image_url: "<?php echo $button; ?>",
 			button_placeholder_id: "flash-browse-button",
 			upload_url : "admin-post.php",
-			flash_url : "../wp-includes/js/swfupload/swfupload.swf",
+			flash_url : "<?php echo $siteurl; ?>",
 			file_post_name: "file",
 			file_types: "*.*",
 			post_params : {

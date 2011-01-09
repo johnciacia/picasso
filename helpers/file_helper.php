@@ -12,6 +12,7 @@ class FileHelper {
     //@TODO - filename should be an md5 or sanatized
     $file = wp_unique_filename($directory, $_FILES['file']['name']);
     
+    //@TODO - Verify the image is of a valid type
     //Is the MIME type valid?
     //wp_check_filetype()
     //if(!in_array($_FILES['file']['type'], $types)) {
