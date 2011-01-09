@@ -121,7 +121,7 @@ class Picasso {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('swfupload-all');
-    wp_enqueue_script('swfupload-handlers');
+    //wp_enqueue_script('swfupload-handlers');
     wp_enqueue_script('picasso_script_1');
     wp_enqueue_script('picasso_script_2');
     
@@ -417,13 +417,13 @@ class Picasso {
   
   function createGallery($atts)
   {
-    extract(shortcode_atts(array('aid' => 0), $atts));
-    $album = $this->albumsModel->getAlbumById($aid);
+    extract(shortcode_atts(array('id' => 0), $atts));
+    $album = $this->albumsModel->getAlbumById($id);
     $album = md5($album);
-    $pictures = $this->picturesModel->getPictures($aid);
+    $pictures = $this->picturesModel->getPictures($id);
     
     foreach($pictures as $picture) {
-      echo "<a rel='example_group' href='" . WP_CONTENT_URL . "/picasso/$album/$picture->filename'>";
+      echo "<a rel='example_group' href='" . WP_CONTENT_URL . "/uploads/picasso/$album/$picture->filename'>";
       echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/$picture->filename' width='100' height='100' style='width:100px;height:100px;' /> ";
       echo "</a>";
     }
