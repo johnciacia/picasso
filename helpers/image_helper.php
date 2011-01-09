@@ -6,8 +6,12 @@
 class ImageHelper 
 {
 	
-  function createThumbnail($image, $toWidth=100, $toHeight=100)
+  function createThumbnail($a, $album, $toWidth=100, $toHeight=100)
   {
+  	$image = WP_CONTENT_DIR . "/uploads/picasso/$album/$a";
+  	
+  	
+  	
     list($width, $height, $type) = getimagesize($image);
     $mime = image_type_to_mime_type($type);
     
@@ -26,7 +30,7 @@ class ImageHelper
 
     $imageResized = imagecreatetruecolor($new_width, $new_height);
     switch($mime) {
-    	case 'image/jpeg':
+    	case 'image/jpeg':    
     		$imageTmp = imagecreatefromjpeg ($image);
     		break;
     		
@@ -42,9 +46,15 @@ class ImageHelper
     		return false;
     }
     
-    imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);	
+    $b = imagecopyresampled($imageResized, $imageTmp, 0, 0, 0, 0, $new_width, $new_height, $width, $height);	
     
-    $img = WP_CONTENT_DIR . "/uploads/picasso/$album/{$image}_t";
+    
+    $b = explode(".", $a);
+    $a = $b[0] . "_t.". $b[1];
+    
+    $img = WP_CONTENT_DIR . "/uploads/picasso/$album/$a";
+    
+    
     
     switch($mime) {
     	case 'image/jpeg':

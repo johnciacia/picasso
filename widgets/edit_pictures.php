@@ -4,7 +4,10 @@
   } else {
     foreach($pictures as $picture) {
     
-      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/" . $picture->filename . "' width='100' height='100' /> ";
+    	$a = explode(".", $picture->filename);
+    	$b = $a[0] . "_t." . $a[1];
+    	
+      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/" . $b . "' /> ";
     
     }
   }
