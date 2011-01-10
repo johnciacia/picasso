@@ -33,6 +33,7 @@ require_once('models/albums_model.php');
 require_once('models/pictures_model.php');
 require_once('helpers/file_helper.php');
 require_once('helpers/image_helper.php');
+require_once('helpers/error_helper.php');
 
 $picasso = new Picasso();
 
@@ -94,6 +95,7 @@ class Picasso {
   var $picturesModel;
   var $fileHelper;
   var $imageHelper;
+  var $errorHelper;
 
   /**
   * Create necessary models
@@ -105,6 +107,7 @@ class Picasso {
     $this->picturesModel = new PicturesModel();
     $this->fileHelper = new FileHelper();
     $this->imageHelper = new ImageHelper();
+    $this->errorHelper = ErrorHelper::getInstance();
     
   }
   
@@ -331,6 +334,11 @@ class Picasso {
   */  
   function creditsWidget()
   {
+  	//$error = $this->errorHelper::getInstance();
+  	//$this->errorHelper->setError('This is a test');
+  	
+  	echo $this->errorHelper->getErrorCount();
+  	die();
     require_once('widgets/credits.php');
   }
 
@@ -388,6 +396,8 @@ class Picasso {
   {
     if (!current_user_can('publish_pages'))
       wp_die(__('Begone'));
+    
+    $this->errorHelper->setError('This is a test');
       
     //check_admin_referer('picasso-general');
 
