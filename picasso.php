@@ -367,10 +367,16 @@ class Picasso {
   {
 
     $file = $this->fileHelper->upload(md5($_POST['album']));
-    if($file === false) {
-      die("The picture failed to upload");
-    }
     
+    //@TODO - Is it more efficient to check if errors != 1 or the file === false?
+    //Upload error checking
+    if(ErrorHelper::getInstance()->getErrorCount() > 0) {
+      $perrors = &ErrorHelper::getInstance()->getErrors();
+      //@TODO: maybe there is a better way to show this??? meaning fewer new lines???
+      while(!empty($perrors))
+        echo "<div id=\"message\" class=\"error\"><br />".array_pop($perrors)."<br /><br /></div>";//neatly position the error
+      return;
+    }
     
     //@TODO - Create thumbnail
     $this->imageHelper->createThumbnail($file, md5($_POST['album']));
