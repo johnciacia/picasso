@@ -45,6 +45,18 @@ class PicturesModel {
     return $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}picasso_pictures`");
     
   }
+  
+  /**
+  *
+  */
+  function deletePicture($id)
+  {
+    global $wpdb;
+    $id = (int) $wpdb->escape($id);
+    $sql = "DELETE FROM `{$wpdb->prefix}picasso_pictures` WHERE `id` = $id";  
+    $wpdb->query($sql);
+  }
+  
 
 }
 

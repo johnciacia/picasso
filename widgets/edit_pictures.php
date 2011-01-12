@@ -11,7 +11,8 @@
 
 			echo '<td width="20%" style="border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;text-align:center;">';
 				echo "<img src='" . PICASSO_UPLOAD_URL . "/$album/" . $t . "' /><br />";
-				echo "<input type='button' class='button' name='delete' value='Delete' />";
+				echo "<input type='button' class='button' onclick='window.location=\"?action=picasso-set-album-cover&pid={$picture->id}&aid={$_GET['id']}\"' name='delete' value='Set Album Cover' />";
+				echo "<input type='button' class='button' onclick='window.location=\"?action=picasso-delete-picture&id={$picture->id}\"' name='delete' value='Delete' />";
 			echo '</td>';
 			
 			echo '<td valign="top" style="border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;">';
