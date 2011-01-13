@@ -1,3 +1,4 @@
+<div class="picasso">
 <?php
 
 foreach($pictures as $picture) {    
@@ -5,11 +6,12 @@ foreach($pictures as $picture) {
 	$t = $info['filename'] . "_thumb." . $info['extension'];
 	
   echo "<a rel='picasso-album' href='" . PICASSO_UPLOAD_URL . "/$album/$picture->filename'>";
-  echo "<img src='" . PICASSO_UPLOAD_URL . "/$album/$t' /> ";
+  echo "<img class='thumb' src='" . PICASSO_UPLOAD_URL . "/$album/$t' /> ";
   echo "</a>";
 }
 
 ?>
+</div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {

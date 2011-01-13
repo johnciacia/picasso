@@ -8,7 +8,7 @@ Version: 0.1
 Author: John Ciacia
 Author URI: http://www.johnciacia.com
 
-Copyright 2009  John Ciacia  (email : john [at] johnciacia [dot] com)
+Copyright 2011  John Ciacia  (email : john [at] johnciacia [dot] com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -45,6 +45,10 @@ add_action('admin_menu', array($picasso , 'admin_menu'));
 *
 */
 add_action('init', array($picasso, 'init'));
+/**
+*
+*/
+add_action('admin_init', array($picasso, 'admin_init'));
 /**
 *
 */
@@ -130,7 +134,6 @@ class Picasso {
   
   /**
   * Load necessary javascript libraries
-  * @TODO - Only load scripts on the necessary pages
   */
   function init() 
   {
@@ -141,12 +144,8 @@ class Picasso {
       WP_PLUGIN_URL . '/picasso/fancybox/jquery.fancybox-1.3.4.pack.js');
 
     
-    wp_enqueue_script('common');
-    wp_enqueue_script('wp-lists');
-    wp_enqueue_script('postbox');
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
-    wp_enqueue_script('swfupload-all');
     
     //Load styles
     wp_register_style('picasso_style_1',
@@ -157,6 +156,17 @@ class Picasso {
     wp_enqueue_style('picasso_style_1');
     wp_enqueue_style('picasso_style_2');
     
+  }
+  
+  /**
+  * Load necessary javascript libraries for admin interface
+  */  
+  function admin_init()
+  {
+    wp_enqueue_script('swfupload-all');
+    wp_enqueue_script('wp-lists');
+    wp_enqueue_script('common');
+    wp_enqueue_script('postbox');
   }
 
   /**
@@ -418,6 +428,20 @@ class Picasso {
     if($_GET['id'] != (integer)$_GET['id']) 
     	wp_die(__('Begone'));
 	  	
+    $album = $this->picturesModel->getAlbumById((integer)$_GET['id']);
+    $album = $this->albumsModel->getAlbumById($album);
+    $album = md5($album);
+    
+    $filename = $this->picturesModel->getFilenameById((integer)$_GET['id']);
+		$file = PICASSO_UPLOAD_DIR . "/$album/$filename";
+		unlink($file);
+    
+		$info = pathinfo($filename);
+		$t = $info['filename'] . "_thumb." . $info['extension'];
+		
+		$file = PICASSO_UPLOAD_DIR . "/$album/$t";
+		unlink($file);
+    
 	  $this->picturesModel->deletePicture((integer)$_GET['id']);
       
     wp_redirect($_SERVER['HTTP_REFERER']);
@@ -482,6 +506,9 @@ class Picasso {
 	  	
   }
   
+  /**
+  * Credit to Scribu @ http://scribu.net/wordpress/optimal-script-loading.html
+  */
   function footerAction()
   {
   	if($this->includeJS == true) {
