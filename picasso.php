@@ -228,12 +228,14 @@ class Picasso {
     add_meta_box('picasso-edit-album', 'Edit Album', array(&$this, 'editAlbumWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core');
 			
-    add_meta_box('picasso-upload-picture', 'Edit Pictures', array(&$this, 'uploadPictureWidget'),
+    add_meta_box('picasso-upload-picture', 'Upload Pictures', array(&$this, 'uploadPictureWidget'),
       'admin_page_picasso-edit-album', 'normal', 'core'); 
 
     add_meta_box('picasso-edit-pictures', 'Edit Pictures', array(&$this, 'editPicturesWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core'); 
 
+    add_meta_box('picasso-album-information', 'Album', array(&$this, 'albumInformationWidget'), 
+      'admin_page_picasso-edit-album', 'side', 'core'); 
 
   }  
 
@@ -339,6 +341,13 @@ class Picasso {
     require_once('widgets/edit_pictures.php');
 
   }
+	
+	function albumInformationWidget()
+	{
+		$cover = $this->albumsModel->getAlbumCoverById($_GET['id']);
+		print_r($cover);
+		require_once('widgets/album_information.php');
+	}
 
   /**
   *

@@ -45,7 +45,14 @@ class AlbumsModel {
 	  
 	function getAlbumCoverById($id)
 	{
-			
+    global $wpdb;
+    
+  	$sql = "SELECT * FROM `{$wpdb->prefix}picasso_albums` 
+  		JOIN `{$wpdb->prefix}picasso_pictures` 
+  		WHERE {$wpdb->prefix}picasso_albums.cid = {$id}";
+			echo $sql;
+	  	
+		return $wpdb->get_results($sql);			
 			
 	}
 		
