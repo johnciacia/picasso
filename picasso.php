@@ -323,6 +323,8 @@ class Picasso {
   */  
   function editAlbumWidget()
   {
+		
+    $album = $this->albumsModel->getAlbumById($_GET['id']);
     require_once('widgets/edit_album.php');
   }
 
