@@ -74,10 +74,17 @@ class FileHelper {
     $directory = PICASSO_UPLOAD_DIR . "/$name/";
     
     //@TODO - if $directory already exists, should we upload pictures there anyway? or return an error?
-    //if(file_exists($directory))
-    //  return false;
+    if(file_exists($directory)){
+      ErrorHelper::getInstance()->setError("The album directory already exists");
+      return false;
+    }
     
-    return wp_mkdir_p($directory);
+    if (wp_mkdir_p($directory) == false){
+      ErrorHelper::getInstance()->setError("Couldn't create the album directory");
+      return false;
+    }
+
+    return true;
   
   }
 

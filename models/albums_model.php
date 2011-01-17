@@ -68,24 +68,27 @@ class AlbumsModel {
     * Both $data columns and $data values should be "raw" (neither should be SQL escaped).
     */
     
-    /**
-    * @TODO: Check to see if NAME already exists - return false
-    * @TODO: Use WP_Error
-    */
-    if($args['name'] == "") {
+    $usedname = $wpdb->get_var("SELECT COUNT(*) FROM
+    `{$wpdb->prefix}picasso_albums` WHERE name='{$args['name']}'");
+    if($usedname > 0){
+      ErrorHelper::getInstance()->setError("The album name already exists.");
       return false;
-      return new WP_Error('picasso-error', __('You must supply an album name.'));
+    }
+    
+    if($args['name'] == "") {
+      ErrorHelper::getInstance()->setError("You must supply an album name.");
+      return false;
     }
       
     if(strlen($args['name']) > 255) {
+      ErrorHelper::getInstance()->setError("The name must be less than 255 characters.");
       return false;
-      return new WP_Error('picasso-error', __('The name must be less than 255 characters'));
     }
       
     $data = array('name' => $args['name']);
     $wpdb->insert("{$wpdb->prefix}picasso_albums", (array) $data);  
     
-    return $wpdb->insert_id;
+    return $wpdb->insert_id;//returns false or the row id
   }
   
   /**

@@ -8,6 +8,7 @@ function uninstall() {
 	$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}picasso_albums");
 	$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}picasso_pictures");	
   delete_option('PICASSO_DBVERSION');
+  delete_option('PICASSO_ERROR');
 }
 
 uninstall();
