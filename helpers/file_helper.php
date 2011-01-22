@@ -68,10 +68,10 @@ class FileHelper {
   
   }
   
-  function createAlbum($album)
+  function createAlbum($dir)
   {
-    $name = md5($album);
-    $directory = PICASSO_UPLOAD_DIR . "/$name/";
+	
+    $directory = PICASSO_UPLOAD_DIR . "/$dir/";
     
     //@TODO - if $directory already exists, should we upload pictures there anyway? or return an error?
     if(file_exists($directory)){
