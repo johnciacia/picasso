@@ -408,6 +408,7 @@ class Picasso {
 	{
 		//@TODO $_POST['dir'] should be escaped
 		$file = $this->fileHelper->upload($_POST['dir']);
+		
 
 		//@TODO - Is it more efficient to check if errors != 1 or the file === false?
 		//Upload error checking
@@ -415,14 +416,14 @@ class Picasso {
 			$perrors = &ErrorHelper::getInstance()->getErrors();
 			//@TODO: maybe there is a better way to show this??? meaning fewer new lines???
 			while(!empty($perrors)){
-				echo "<div id=\"message\" class=\"error\"><p>".
-				array_pop($perrors) ."</p></div>";//neatly position the error
+				echo '<div id="message" class="error"><p>' .
+					array_pop($perrors) . '</p></div>'; 
 			}
 			eturn;
 		}
 
 		$this->imageHelper->createThumbnail($file, $_POST['dir']);
-
+		$this->imageHelper->resize($file, $_POST['dir']);
 
 		$data = array(
 			'filename' => $file,
