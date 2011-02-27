@@ -1,3 +1,18 @@
-1. The first image uploaded should automatically be set as the image thumbnail.
-
-2. Multiple albums can have the same name. 
+- Rename album. Users should be able to rename the album.
+- In gallery view, if there are more than 4 albums, the albums overflow the container.
+- Implement recent uploads widget.
+- Implement twitter share link.
+- Show album information in the Album widget.
+- Redesign the Edit Pictures widget.
+- Add "random" image widget.
+- Add button to the TinyMCE editor.
+- Add sponsors widget.
+- Add geolocation support.
+- Allow the photo descriptions to be updated.
+- Add ability to comment on images in the front end.
+- Add the ability to watermark images.
+- Add the ability to rotate images.
+- Add flickr like tagging.
+- RSS feed.
+- Implement public / private albums. When using [picasso], private albums should not show up in the gallery view.
+- Implement public / private pictures. Private pictures should not show up in the album view.

@@ -45,6 +45,7 @@ SWFUpload.onload = function() {
 				"aid" : <?php echo $_GET['id']; ?>,
 				"album" : "<?php echo $album; ?>",
 				"dir"		: "<?php echo $dir; ?>",
+				"uid"		:	"<?php /*@TODO: The user should not have the ability to modify this value through POST requests */echo $current_user->ID; ?>", 
 				"post_id" : "0",
 				"auth_cookie" : "admin|1294697893|d39c7e8ea40c2bd262ef4d8e39d8c55c",
 				"logged_in_cookie": "admin|1294697893|a100aa1736c4b529eb9c5167a00e1809",

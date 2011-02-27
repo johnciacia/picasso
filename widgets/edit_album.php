@@ -1,4 +1,3 @@
-<p>Major pitfall: the directory structure depends on the album name (via md5). Thus, changing the album name will change the hash rendering all links to be broken.</p>
 <form action="admin-post.php" method="post">
       
 <table width="95%">

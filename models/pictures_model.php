@@ -15,6 +15,7 @@ class PicturesModel {
     $data = array(
       'aid' => $args['aid'],
       'filename' => $args['filename'],
+			'uid' => $args['uid'],
       'description' => ''
     );
     
