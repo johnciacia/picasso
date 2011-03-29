@@ -9,13 +9,15 @@
 </form>
 -->
 
-<div id="swfupload-control">
+<div id="swfupload-control" style="text-align: center;">
 	<input type="button" id="flash-browse-button" />
-	<div class="foo" style="max-height:150px; overflow: auto;">
-		<div id="media-items" style="margin: 0p auto;" class="hide-if-no-js"> </div>
-	</div>
+	<div id="picasso-upload-status" style="max-height:150px; text-align: left; overflow: scroll;"></div>
 	<br />
-	<p>12 Succesful | 2 Errors | 5 Queued </p>
+	<p>
+		<span id="picasso-succesful-uploads">0</span> Succesful | 
+		<span id="picasso-error-uploads">0</span> Errors | 
+		<span id="picasso-queued-uploads">0</span> Queued 
+	</p>
 </div>
 
 <?php
@@ -26,6 +28,8 @@
 <script type="text/javascript">
 //<![CDATA[
 var post_id;
+var num_files = 0;
+var file_count = 0;
 var swfu;
 SWFUpload.onload = function() {
 	var settings = {
@@ -55,14 +59,10 @@ SWFUpload.onload = function() {
 				"short" : "1"
 			},
 			file_size_limit : "2097152b",
-			file_dialog_start_handler : fileDialogStart,
 			file_queued_handler : fileQueued,
 			upload_start_handler : uploadStart,
-			upload_progress_handler : uploadProgress,
-			upload_error_handler : uploadError,
 			upload_success_handler : uploadSuccess,
 			upload_complete_handler : uploadComplete,
-			file_queue_error_handler : fileQueueError,
 			file_dialog_complete_handler : fileDialogComplete,
 			custom_settings : {
 				degraded_element_id : "html-upload-ui", // id of the element displayed when swfupload is unavailable
@@ -73,379 +73,55 @@ SWFUpload.onload = function() {
 		swfu = new SWFUpload(settings);
 };
 
-var topWin = window.dialogArguments || opener || parent || top;
-
-function fileDialogStart() {
-	jQuery("#media-upload-error").empty();
-}
-
-// progress and success handlers for media multi uploads
 function fileQueued(fileObj) {
-	// Get rid of unused form
-	jQuery('.media-blank').remove();
-	// Collapse a single item
-	if ( jQuery('form.type-form #media-items').children().length == 1 && jQuery('.hidden', '#media-items').length > 0 ) {
-		jQuery('.describe-toggle-on').show();
-		jQuery('.describe-toggle-off').hide();
-		jQuery('.slidetoggle').slideUp(200).siblings().removeClass('hidden');
-	}
-	// Create a progress bar containing the filename
-	jQuery('#media-items').prepend('<div id="media-item-' + fileObj.id + '" class="media-item child-of-' + post_id + '"><div class="progress"><div class="bar"></div></div><div class="filename original"><span class="percent"></span> ' + fileObj.name + '</div></div>');
-	// Display the progress div
-	jQuery('.progress', '#media-item-' + fileObj.id).show();
 
-	// Disable submit and enable cancel
-	jQuery('#insert-gallery').attr('disabled', 'disabled');
-	jQuery('#cancel-upload').attr('disabled', '');
 }
 
 function uploadStart(fileObj) {
-	try {
-		if ( typeof topWin.tb_remove != 'undefined' )
-			topWin.jQuery('#TB_overlay').unbind('click', topWin.tb_remove); 
-	} catch(e){}
-
 	return true;
 }
 
-function uploadProgress(fileObj, bytesDone, bytesTotal) {
-	// Lengthen the progress bar
-	var w = jQuery('#media-items').width() - 2, item = jQuery('#media-item-' + fileObj.id);
-	jQuery('.bar', item).width( w * bytesDone / bytesTotal );
-	jQuery('.percent', item).html( Math.ceil(bytesDone / bytesTotal * 100) + '%' );
-
-	if ( bytesDone == bytesTotal ) {
-		jQuery('.bar', item).html('<strong class="crunching"></strong>');
-	}
-}
-
-function prepareMediaItem(fileObj, serverData) {
-	var f = ( typeof shortform == 'undefined' ) ? 1 : 2, item = jQuery('#media-item-' + fileObj.id);
-	// Move the progress bar to 100%
-	jQuery('#picasso-pictures tr:first').before("<tr><td width='20%' style='border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;text-align:center;'><img src='' /><br /><input type='button' class='button' name='delete' value='Delete' /></td><td valign='top' style='border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;'><p>Caption: </p><textarea style='width:100%' name='description'>This doesn't work. Sorry.</textarea></td></tr>");
-	
-	
-	jQuery('.bar', item).remove();
-	jQuery('.progress', item).hide();
-
-	try {
-		if ( typeof topWin.tb_remove != 'undefined' )
-			topWin.jQuery('#TB_overlay').click(topWin.tb_remove);
-	} catch(e){}
-
-	// Old style: Append the HTML returned by the server -- thumbnail and form inputs
-	if ( isNaN(serverData) || !serverData ) {
-		item.append(serverData);
-		prepareMediaItemInit(fileObj);
-	}
-	// New style: server data is just the attachment ID, fetch the thumbnail and form html from the server
-	else {
-		item.load('async-upload.php', {attachment_id:serverData, fetch:f}, function(){prepareMediaItemInit(fileObj);updateMediaForm()});
-	}
-}
-
-function prepareMediaItemInit(fileObj) {
-	var item = jQuery('#media-item-' + fileObj.id);
-	// Clone the thumbnail as a "pinkynail" -- a tiny image to the left of the filename
-	jQuery('.thumbnail', item).clone().attr('className', 'pinkynail toggle').prependTo(item);
-
-	// Replace the original filename with the new (unique) one assigned during upload
-	jQuery('.filename.original', item).replaceWith( jQuery('.filename.new', item) );
-
-	// Also bind toggle to the links
-	jQuery('a.toggle', item).click(function(){
-		jQuery(this).siblings('.slidetoggle').slideToggle(350, function(){
-			var w = jQuery(window).height(), t = jQuery(this).offset().top, h = jQuery(this).height(), b;
-
-			if ( w && t && h ) {
-                b = t + h;
-
-                if ( b > w && (h + 48) < w )
-                    window.scrollBy(0, b - w + 13);
-                else if ( b > w )
-                    window.scrollTo(0, t - 36);
-            }
-		});
-		jQuery(this).siblings('.toggle').andSelf().toggle();
-		jQuery(this).siblings('a.toggle').focus();
-		return false;
-	});
-
-	// Bind AJAX to the new Delete button
-	jQuery('a.delete', item).click(function(){
-		// Tell the server to delete it. TODO: handle exceptions
-		jQuery.ajax({
-			url: 'admin-ajax.php',
-			type: 'post',
-			success: deleteSuccess,
-			error: deleteError,
-			id: fileObj.id,
-			data: {
-				id : this.id.replace(/[^0-9]/g, ''),
-				action : 'trash-post',
-				_ajax_nonce : this.href.replace(/^.*wpnonce=/,'')
-			}
-		});
-		return false;
-	});
-
-	// Bind AJAX to the new Undo button
-	jQuery('a.undo', item).click(function(){
-		// Tell the server to untrash it. TODO: handle exceptions
-		jQuery.ajax({
-			url: 'admin-ajax.php',
-			type: 'post',
-			id: fileObj.id,
-			data: {
-				id : this.id.replace(/[^0-9]/g,''),
-				action: 'untrash-post',
-				_ajax_nonce: this.href.replace(/^.*wpnonce=/,'')
-			},
-			success: function(data, textStatus){
-				var item = jQuery('#media-item-' + fileObj.id);
-
-				if ( type = jQuery('#type-of-' + fileObj.id).val() )
-					jQuery('#' + type + '-counter').text(jQuery('#' + type + '-counter').text()-0+1);
-				if ( item.hasClass('child-of-'+post_id) )
-					jQuery('#attachments-count').text(jQuery('#attachments-count').text()-0+1);
-
-				jQuery('.filename .trashnotice', item).remove();
-				jQuery('.filename .title', item).css('font-weight','normal');
-				jQuery('a.undo', item).addClass('hidden');
-				jQuery('a.describe-toggle-on, .menu_order_input', item).show();
-				item.css( {backgroundColor:'#ceb'} ).animate( {backgroundColor: '#fff'}, { queue: false, duration: 500, complete: function(){ jQuery(this).css({backgroundColor:''}); } }).removeClass('undo');
-			}
-		});
-		return false;
-	});
-
-	// Open this item if it says to start open (e.g. to display an error)
-	jQuery('#media-item-' + fileObj.id + '.startopen').removeClass('startopen').slideToggle(500).siblings('.toggle').toggle();
-}
-
-function itemAjaxError(id, html) {
-	var item = jQuery('#media-item-' + id);
-	var filename = jQuery('.filename', item).text();
-
-	item.html('<div class="error-div">'
-				+ '<a class="dismiss" href="#">' + swfuploadL10n.dismiss + '</a>'
-				+ '<strong>' + swfuploadL10n.error_uploading.replace('%s', filename) + '</strong><br />'
-				+ html
-				+ '</div>');
-	item.find('a.dismiss').click(function(){jQuery(this).parents('.media-item').slideUp(200, function(){jQuery(this).remove();})});
-}
-
-function deleteSuccess(data, textStatus) {
-	if ( data == '-1' )
-		return itemAjaxError(this.id, 'You do not have permission. Has your session expired?');
-	if ( data == '0' )
-		return itemAjaxError(this.id, 'Could not be deleted. Has it been deleted already?');
-
-	var id = this.id, item = jQuery('#media-item-' + id);
-
-	// Decrement the counters.
-	if ( type = jQuery('#type-of-' + id).val() )
-		jQuery('#' + type + '-counter').text( jQuery('#' + type + '-counter').text() - 1 );
-	if ( item.hasClass('child-of-'+post_id) )
-		jQuery('#attachments-count').text( jQuery('#attachments-count').text() - 1 );
-
-	if ( jQuery('form.type-form #media-items').children().length == 1 && jQuery('.hidden', '#media-items').length > 0 ) {
-		jQuery('.toggle').toggle();
-		jQuery('.slidetoggle').slideUp(200).siblings().removeClass('hidden');
-	}
-
-	// Vanish it.
-	jQuery('.toggle', item).toggle();
-	jQuery('.slidetoggle', item).slideUp(200).siblings().removeClass('hidden');
-	item.css( {backgroundColor:'#faa'} ).animate( {backgroundColor:'#f4f4f4'}, {queue:false, duration:500} ).addClass('undo');
-
-	jQuery('.filename:empty', item).remove();
-	jQuery('.filename .title', item).css('font-weight','bold');
-	jQuery('.filename', item).append('<span class="trashnotice"> ' + swfuploadL10n.deleted + ' </span>').siblings('a.toggle').hide();
-	jQuery('.filename', item).append( jQuery('a.undo', item).removeClass('hidden') );
-	jQuery('.menu_order_input', item).hide();
-
-	return;
-}
-
-function deleteError(X, textStatus, errorThrown) {
-	// TODO 
-}
-
-function updateMediaForm() {
-	var one = jQuery('form.type-form #media-items').children(), items = jQuery('#media-items').children();
-
-	// Just one file, no need for collapsible part
-	if ( one.length == 1 ) {
-		jQuery('.slidetoggle', one).slideDown(500).siblings().addClass('hidden').filter('.toggle').toggle();
-	}
-
-	// Only show Save buttons when there is at least one file.
-	if ( items.not('.media-blank').length > 0 )
-		jQuery('.savebutton').show();
-	else
-		jQuery('.savebutton').hide();
-
-	// Only show Gallery button when there are at least two files.
-	if ( items.length > 1 )
-		jQuery('.insert-gallery').show();
-	else
-		jQuery('.insert-gallery').hide();
-}
 
 function uploadSuccess(fileObj, serverData) {
-	// if async-upload returned an error message, place it in the media item div and return
-	if ( serverData.match('media-upload-error') ) {
-		jQuery('#media-item-' + fileObj.id).html(serverData);
-		return;
+	var obj = jQuery.parseJSON(serverData);
+	
+	if(obj.status == "SUCCESS") {
+		file_count = file_count + 1;
+		jQuery("#picasso-pictures").prepend('<img src="' + obj.data + '" width="50" height="50" style="padding:5px;" />');
+		jQuery("#picasso-upload-status").prepend("<p>" + obj.filename + " successfully uploaded.</p>");
+		jQuery('#picasso-succesful-uploads').text(""+(parseInt(jQuery('#picasso-succesful-uploads').text())+1));
+	} else {
+		console.log(obj.data);
+		jQuery("#picasso-upload-status").prepend("<p>" + obj.filename + " failed to uploaded.</p>");
+		jQuery('#picasso-error-uploads').text(""+(parseInt(jQuery('#picasso-error-uploads').text())+1));
 	}
-
-	prepareMediaItem(fileObj, serverData);
-	updateMediaForm();
-
-	// Increment the counter.
-	if ( jQuery('#media-item-' + fileObj.id).hasClass('child-of-' + post_id) )
-		jQuery('#attachments-count').text(1 * jQuery('#attachments-count').text() + 1);
+	jQuery('#picasso-queued-uploads').text(""+(parseInt(jQuery('#picasso-queued-uploads').text())-1))
 }
 
 function uploadComplete(fileObj) {
-	// If no more uploads queued, enable the submit button
-	if ( swfu.getStats().files_queued == 0 ) {
-		jQuery('#cancel-upload').attr('disabled', 'disabled');
-		jQuery('#insert-gallery').attr('disabled', '');
+	if(file_count == num_files) {
+		jQuery("#poststuff").prepend('<div id="message" class="updated below-h2"><p>All images were successfully uploaded!</p></div>');
 	}
+
 }
 
-
-// wp-specific error handlers
-
-// generic message
-function wpQueueError(message) {
-	jQuery('#media-upload-error').show().text(message);
-}
-
-// file-specific message
-function wpFileError(fileObj, message) {
-	var item = jQuery('#media-item-' + fileObj.id);
-	var filename = jQuery('.filename', item).text();
-
-	item.html('<div class="error-div">'
-				+ '<a class="dismiss" href="#">' + swfuploadL10n.dismiss + '</a>'
-				+ '<strong>' + swfuploadL10n.error_uploading.replace('%s', filename) + '</strong><br />'
-				+ message
-				+ '</div>');
-	item.find('a.dismiss').click(function(){jQuery(this).parents('.media-item').slideUp(200, function(){jQuery(this).remove();})});
-}
-
-function fileQueueError(fileObj, error_code, message)  {
-	// Handle this error separately because we don't want to create a FileProgress element for it.
-	if ( error_code == SWFUpload.QUEUE_ERROR.QUEUE_LIMIT_EXCEEDED ) {
-		wpQueueError(swfuploadL10n.queue_limit_exceeded);
-	}
-	else if ( error_code == SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT ) {
-		fileQueued(fileObj);
-		wpFileError(fileObj, swfuploadL10n.file_exceeds_size_limit);
-	}
-	else if ( error_code == SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE ) {
-		fileQueued(fileObj);
-		wpFileError(fileObj, swfuploadL10n.zero_byte_file);
-	}
-	else if ( error_code == SWFUpload.QUEUE_ERROR.INVALID_FILETYPE ) {
-		fileQueued(fileObj);
-		wpFileError(fileObj, swfuploadL10n.invalid_filetype);
-	}
-	else {
-		wpQueueError(swfuploadL10n.default_error);
-	}
-}
 
 function fileDialogComplete(num_files_queued) {
+	jQuery('#picasso-queued-uploads').text(""+num_files_queued);
 	try {
 		if (num_files_queued > 0) {
+			num_files = num_files_queued;
 			this.startUpload();
 		}
 	} catch (ex) {
 		this.debug(ex);
 	}
-}
-
-function switchUploader(s) {
-	var f = document.getElementById(swfu.customSettings.swfupload_element_id), h = document.getElementById(swfu.customSettings.degraded_element_id);
-	if ( s ) {
-		f.style.display = 'block';
-		h.style.display = 'none';
-	} else {
-		f.style.display = 'none';
-		h.style.display = 'block';
-	}
-}
-
-function swfuploadPreLoad() {
-	if ( !uploaderMode ) {
-		switchUploader(1);
-	} else {
-		switchUploader(0);
-	}
-}
-
-function swfuploadLoadFailed() {
-	switchUploader(0);
-	jQuery('.upload-html-bypass').hide();
-}
-
-function uploadError(fileObj, errorCode, message) {
-
-	switch (errorCode) {
-		case SWFUpload.UPLOAD_ERROR.MISSING_UPLOAD_URL:
-			wpFileError(fileObj, swfuploadL10n.missing_upload_url);
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
-			wpFileError(fileObj, swfuploadL10n.upload_limit_exceeded);
-			break;
-		case SWFUpload.UPLOAD_ERROR.HTTP_ERROR:
-			wpQueueError(swfuploadL10n.http_error);
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_FAILED:
-			wpQueueError(swfuploadL10n.upload_failed);
-			break;
-		case SWFUpload.UPLOAD_ERROR.IO_ERROR:
-			wpQueueError(swfuploadL10n.io_error);
-			break;
-		case SWFUpload.UPLOAD_ERROR.SECURITY_ERROR:
-			wpQueueError(swfuploadL10n.security_error);
-			break;
-		case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
-		case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
-			jQuery('#media-item-' + fileObj.id).remove();
-			break;
-		default:
-			wpFileError(fileObj, swfuploadL10n.default_error);
-	}
+	
 }
 
 function cancelUpload() {
 	swfu.cancelQueue();
 }
 
-// remember the last used image size, alignment and url
-jQuery(document).ready(function($){
-	$('input[type="radio"]', '#media-items').live('click', function(){
-		var tr = $(this).closest('tr');
-
-		if ( $(tr).hasClass('align') )
-			setUserSetting('align', $(this).val());
-		else if ( $(tr).hasClass('image-size') )
-			setUserSetting('imgsize', $(this).val());
-	});
-
-	$('button.button', '#media-items').live('click', function(){
-		var c = this.className || '';
-		c = c.match(/url([^ '"]+)/);
-		if ( c && c[1] ) {
-			setUserSetting('urlbutton', c[1]);
-			$(this).siblings('.urlfield').val( $(this).attr('title') );
-		}
-	});
-});
 //]]>
 </script> 

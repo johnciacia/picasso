@@ -2,7 +2,6 @@
 <?php
 
 	foreach($albums as $album) {
-		
 		if($album->filename == "") {
 			$img = WP_PLUGIN_URL . '/picasso/images/default_album.jpg';
 		} else {
@@ -17,7 +16,7 @@
     if (isset($query[1])) {
       $add .= $query[1].'&amp;';
     }
-    $add .= "id={$album->id}";
+    $add .= "id={$album->aid}";
     $url = $query[0].$add;
 
 		echo "<div class='picasso-gallery' style='display: table-cell'>";

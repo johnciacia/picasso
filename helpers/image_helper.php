@@ -11,6 +11,7 @@ class ImageHelper
   	$image = PICASSO_UPLOAD_DIR . "/$album/$filename";
   	
     list($width, $height, $type) = getimagesize($image);
+
     $mime = image_type_to_mime_type($type);
 		
 		//Preserve aspect ratio
@@ -62,8 +63,8 @@ class ImageHelper
     		imagegif($thumb, $image);
   			break;
   			
-			case 'image/png':
-    		imagepng($thumb, $image, 100);
+		case 'image/png':
+    		imagepng($thumb, $image, 9);
   			break;
   			
     	default:
