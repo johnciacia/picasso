@@ -6,9 +6,6 @@
 class ImageHelper 
 {
 	
-	/**
-	* @TODO - Error checking
-	*/
   function createThumbnail($filename, $album, $w = 100, $h = 100)
   {
   	
@@ -34,6 +31,8 @@ class ImageHelper
     	default:
     		return false;
     }
+    
+    imagecopyresampled($thumb, $temp, 0, 0, 0, 0, $w, $h, $width, $height);	
     
     
     $info = pathinfo($image);
