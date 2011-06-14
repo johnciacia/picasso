@@ -75,7 +75,9 @@ add_action('admin_action_picasso-delete-album',
 */
 add_action('admin_post_picasso-upload-picture', 
   array(&$picasso, 'uploadPictureAction'));
-
+  
+add_action('admin_action_picasso-upload-picture', 
+  array(&$picasso, 'uploadPictureAction'));
 /**
 *
 */  
@@ -91,7 +93,7 @@ class Picasso {
   /**
   * Create necessary models
   */
-	function Picasso() 
+  function Picasso() 
   {
   
     $this->albumsModel = new AlbumsModel();
@@ -107,24 +109,30 @@ class Picasso {
   function init() 
   {
     //Load scripts
-		wp_register_script('picasso_script_1', 
+    wp_register_script('picasso_script_1', 
       WP_PLUGIN_URL . '/picasso/fancybox/jquery.mousewheel-3.0.4.pack.js');
-		wp_register_script('picasso_script_2', 
+    wp_register_script('picasso_script_2', 
       WP_PLUGIN_URL . '/picasso/fancybox/jquery.fancybox-1.3.4.pack.js');
+
     
     wp_enqueue_script('common');
     wp_enqueue_script('wp-lists');
     wp_enqueue_script('postbox');
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
+    wp_enqueue_script('swfupload-all');
+    wp_enqueue_script('swfupload-handlers');
     wp_enqueue_script('picasso_script_1');
     wp_enqueue_script('picasso_script_2');
     
     //Load styles
     wp_register_style('picasso_style_1',
+      WP_PLUGIN_URL . '/picasso/style.css');
+    wp_register_style('picasso_style_2',
       WP_PLUGIN_URL . '/picasso/fancybox/jquery.fancybox-1.3.4.css');
       
     wp_enqueue_style('picasso_style_1');
+    wp_enqueue_style('picasso_style_2');
     
   }
 
@@ -344,17 +352,18 @@ class Picasso {
   */  
   function uploadPictureAction()
   {
-    $file = $this->fileHelper->upload(md5($_POST['album']));
-    if($file === false) {
-      die("The picture failed to upload");
-    }
+
+    //$file = $this->fileHelper->upload(md5($_POST['album']));
+    //if($file === false) {
+    //  die("The picture failed to upload");
+    //}
     
     
     //@TODO - Create thumbnail
     //$this->fileHelper->createThumbnail($file);
     $data = array(
-      'filename' => $file,
-      'aid' => $_POST['aid']
+      'filename' => 'test', //$file,
+      'aid' => 6//$_POST['aid']
     );
     
     $picture = $this->picturesModel->addPicture($data);
@@ -362,7 +371,7 @@ class Picasso {
       die("The picture was not inserted into the database");
     }
     
-    wp_redirect($_SERVER['HTTP_REFERER']);
+    //wp_redirect($_SERVER['HTTP_REFERER']);
   }
 
   /**

@@ -1,6 +1,4 @@
 <form action="admin-post.php" method="post">
-<?php
-?>
       
 <table width="95%">
 
