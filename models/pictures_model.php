@@ -23,7 +23,7 @@ class PicturesModel {
   }
   
   /**
-  *
+  * @param $aid Album ID
   */  
   function getPictures($aid)
   {
@@ -34,6 +34,24 @@ class PicturesModel {
     return $wpdb->get_results($sql);
     
   }
+  
+  function getAlbumById($id)
+  {
+    global $wpdb;
+    
+    $sql = "SELECT `aid` FROM `{$wpdb->prefix}picasso_pictures` WHERE `id` = %d";
+    return $wpdb->get_var($wpdb->prepare($sql, $id));	  	 	
+  }
+  
+  function getFilenameById($id)
+  {
+    global $wpdb;
+    
+    $sql = "SELECT `filename` FROM `{$wpdb->prefix}picasso_pictures` WHERE `id` = %d";
+    return $wpdb->get_var($wpdb->prepare($sql, $id));	 
+  }
+  
+  
   
   /**
   *
