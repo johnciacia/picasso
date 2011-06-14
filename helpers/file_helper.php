@@ -8,7 +8,7 @@ class FileHelper {
   {
   
     $types = array('image/gif', 'image/jpeg', 'image/png');
-    $directory = WP_CONTENT_DIR . "/picasso/$album/";
+    $directory = WP_CONTENT_DIR . "/uploads/picasso/$album/";
     //@TODO - filename should be an md5 or sanatized
     $file = wp_unique_filename($directory, $_FILES['file']['name']);
     
@@ -70,7 +70,7 @@ class FileHelper {
   function createAlbum($album)
   {
     $name = md5($album);
-    $directory = WP_CONTENT_DIR . "/picasso/$album/";
+    $directory = WP_CONTENT_DIR . "/uploads/picasso/$album/";
     
     //@TODO - if $directory already exists, should we upload pictures there anyway? or return an error?
     //if(file_exists($directory))
