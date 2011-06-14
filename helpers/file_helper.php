@@ -28,38 +28,38 @@ class FileHelper {
     $max_size = $max_size * $mul;
     
     if($_FILES['file']['size'] >= $max_size) {
-      die("File size too big");
+      ErrorHelper::getInstance()->setError("The file is too big");
       return false;
     }
     
     //Where there any errors?
     if ($_FILES['file']['error'] > 0) {
-      die("There were errors uploading");
+      ErrorHelper::getInstance()->setError("There were errors uploading");
       return false;
     }
     
     //Does the directory exist?
     if($directory == false) {
-      die("The directory exists");
+      ErrorHelper::getInstance()->setError("The directory exists");
       return false;
     }
       
     //Can we write to the directory?
     if(!is_writable($directory)) {
-      die("The directory is not writable");
+      ErrorHelper::getInstance()->setError("The directory is not writable");
       return false;
     }
     
     //Does the file already exist?
     //This should never happen since $file is unique
     if(file_exists($directory . $file)) {
-      echo "The file already exists";
+      ErrorHelper::getInstance()->setError("The file already exists");
       return false;
     }
     
     //Was the file uploaded succesfully?
     if(move_uploaded_file($_FILES['file']['tmp_name'], $directory . $file) == false) {
-      die("The file failed to move");
+      ErrorHelper::getInstance()->setError("The file failed to move");
       return false;
     }
     

@@ -30,9 +30,9 @@ class ErrorHelper {
     }  
     
     //return a reference to the error array
-    public function &getErrors()
+    public function getErrors()
     {
-        return $error_array;
+        return self::$error_array;
     } 
     
     public function getErrorCount()
@@ -43,7 +43,7 @@ class ErrorHelper {
     
     public function getError($id)
     {
-        return $error_array[$id];
+        return self::$error_array[$id];
     } 
     
     public function setError($error_text)
