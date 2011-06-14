@@ -112,13 +112,17 @@ function uploadProgress(fileObj, bytesDone, bytesTotal) {
 	jQuery('.bar', item).width( w * bytesDone / bytesTotal );
 	jQuery('.percent', item).html( Math.ceil(bytesDone / bytesTotal * 100) + '%' );
 
-	if ( bytesDone == bytesTotal )
-		jQuery('.bar', item).html('<strong class="crunching">' + swfuploadL10n.crunching + '</strong>');
+	if ( bytesDone == bytesTotal ) {
+		jQuery('.bar', item).html('<strong class="crunching"></strong>');
+	}
 }
 
 function prepareMediaItem(fileObj, serverData) {
 	var f = ( typeof shortform == 'undefined' ) ? 1 : 2, item = jQuery('#media-item-' + fileObj.id);
 	// Move the progress bar to 100%
+	jQuery('#picasso-pictures tr:first').before("<tr><td width='20%' style='border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;text-align:center;'><img src='' /><br /><input type='button' class='button' name='delete' value='Delete' /></td><td valign='top' style='border-bottom: 1px solid #999;padding-bottom:10px;padding-top:10px;'><p>Caption: </p><textarea style='width:100%' name='description'>This doesn't work. Sorry.</textarea></td></tr>");
+	
+	
 	jQuery('.bar', item).remove();
 	jQuery('.progress', item).hide();
 
