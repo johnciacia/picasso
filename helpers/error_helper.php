@@ -19,9 +19,9 @@ class ErrorHelper {
         //we don't want this class to be cloned
     }
     
-    public static function getInstanceOf() 
+    public static function getInstance() 
     { 
-        if (!self::$instance) 
+        if (!isset(self::$instance)) 
         { 
             self::$instance = new ErrorHelper(); 
         } 
@@ -38,7 +38,7 @@ class ErrorHelper {
     public function getErrorCount()
     {
         //@TODO: O(n) time, not acceptable, modify a constant variable??
-        return count($error_array);
+        return count(self::$error_array);
     } 
     
     public function getError($id)
@@ -48,7 +48,7 @@ class ErrorHelper {
     
     public function setError($error_text)
     {
-        array_push($error_array, $error_text);
+        array_push(self::$error_array, $error_text);
     }
     
 }
