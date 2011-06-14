@@ -6,7 +6,7 @@
 class ImageHelper 
 {
 	
-  function createThumbnail($filename, $album, $w = 100, $h = 100)
+  function createThumbnail($filename, $album, $w = 150, $h = 150)
   {
   	
   	$image = PICASSO_UPLOAD_DIR . "/$album/$filename";
