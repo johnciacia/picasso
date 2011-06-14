@@ -1,4 +1,3 @@
-<!-- 
 <form action="admin-post.php" method="post" enctype="multipart/form-data">
   <label for="file">Filename:</label>
     <input type="file" name="file" id="file" /> 
@@ -7,8 +6,8 @@
     <input type="hidden" name="action" value="picasso-upload-picture" />    
     <input type="submit" class="button" name="submit" value="Upload" />
 </form>
--->
 
+<!-- 
 <div id="swfupload-control">
 	<input type="button" id="flash-browse-button" />
 	<div id="media-items" class="hide-if-no-js"> </div>
@@ -27,12 +26,14 @@ SWFUpload.onload = function() {
 			button_text_top_padding: 3,
 			button_image_url: '../wp-includes/images/upload.png?ver=20100531',
 			button_placeholder_id: "flash-browse-button",
-			upload_url : "http://localhost/wordpress/wp-admin/admin-post.php?action=picasso-upload-picture",
+			upload_url : "admin-post.php",
 			flash_url : "../wp-includes/js/swfupload/swfupload.swf",
-			file_post_name: "async-upload",
+			file_post_name: "file",
 			file_types: "*.*",
 			post_params : {
 				"action" : "picasso-upload-picture",
+				"aid" : <?php echo $_GET['id']; ?>,
+				"album" : "<?php echo $album; ?>",
 				"post_id" : "0",
 				"auth_cookie" : "admin|1294697893|d39c7e8ea40c2bd262ef4d8e39d8c55c",
 				"logged_in_cookie": "admin|1294697893|a100aa1736c4b529eb9c5167a00e1809",
@@ -63,3 +64,4 @@ SWFUpload.onload = function() {
 
 //]]>
 </script> 
+-->
