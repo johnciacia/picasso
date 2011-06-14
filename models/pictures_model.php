@@ -4,25 +4,40 @@
 */
 class PicturesModel {
 
-  /**
-  *
-  */
-  function addPicture($args)
-  {
+	/**
+	*
+	*/
+	function addPicture($args)
+	{
   
-    global $wpdb;
-    
-    $data = array(
-      'aid' => $args['aid'],
-      'filename' => $args['filename'],
-			'uid' => $args['uid'],
-      'description' => ''
-    );
-    
-    $wpdb->insert("{$wpdb->prefix}picasso_pictures", (array) $data); 
+		global $wpdb;
 
-  }
+		$data = array(
+			'aid' => $args['aid'],
+			'filename' => $args['filename'],
+			'uid' => $args['uid'],
+			'description' => ''
+			);
+    
+		$wpdb->insert("{$wpdb->prefix}picasso_pictures", (array) $data); 
+
+	}
+
+	function updatePicture($args)
+	{
+	
+		global $wpdb;
+		return $wpdb->update("{$wpdb->prefix}picasso_pictures", 
+			array("description" => $args['description']), 
+			array("id" => (int)$args['id']));
+	
+	}
   
+	function deletePicturesByAlbum($aid)
+	{
+		global $wpdb;
+		return $wpdb->query($wpdb->prepare("DELETE FROM `{$wpdb->prefix}picasso_pictures` WHERE `aid` = %d", $aid));
+	}
   /**
   * @param $aid Album ID
   */  
@@ -32,9 +47,18 @@ class PicturesModel {
     global $wpdb;
     
     $sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}picasso_pictures WHERE `aid` = %d ORDER BY `id` DESC", $aid);
+
     return $wpdb->get_results($sql);
     
   }
+
+	function getPicture($id)
+	{
+		global $wpdb;
+		
+		$sql = "SELECT * FROM `{$wpdb->prefix}picasso_pictures` WHERE `id` = %d";
+		return $wpdb->get_row($wpdb->prepare($sql, $id));
+	}
   
   function getAlbumById($id)
   {

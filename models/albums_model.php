@@ -91,6 +91,14 @@ class AlbumsModel {
     return $wpdb->insert_id;//returns false or the row id
   }
   
+function updateAlbum($args)
+{
+	global $wpdb;
+	$wpdb->update("{$wpdb->prefix}picasso_albums", 
+		array('name' => $args['name'], 'privacy' => $args['privacy']), 
+		array('id' => $args['id']));
+	
+}
   /**
   * @param $id the album id to be deleted
   * @return (mixed) FALSE on error or the number of rows affected on success

@@ -5,7 +5,7 @@ foreach($pictures as $picture) {
 	$info = pathinfo($picture->filename);
 	$t = $info['filename'] . "_thumb." . $info['extension'];
 	
-  echo "<a rel='picasso-album' href='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$picture->filename'>";
+  echo "<a rel='picasso-album' title='{$picture->description}' href='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$picture->filename'>";
   echo "<img class='thumb' src='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$t' />";
   echo "</a>";
 }

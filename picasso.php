@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
 
+
 define('PICASSO_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/picasso');
 define('PICASSO_UPLOAD_URL',  WP_CONTENT_URL . '/uploads/picasso');
 
@@ -76,6 +77,16 @@ add_action('admin_post_picasso_save_album',
 	array(&$picasso, 'saveAlbumAction'));
 /**
 *
+*/
+add_action('admin_post_picasso_update_album', 
+	array(&$picasso, 'updateAlbumAction'));
+/**
+*
+*/
+add_action('admin_post_picasso_update_picture', 
+	array(&$picasso, 'updatePictureAction'));
+/**
+*
 */  
 add_action('admin_action_picasso-delete-album', 
 	array(&$picasso, 'deleteAlbumAction'));
@@ -123,6 +134,7 @@ class Picasso {
 	*/
 	function Picasso() 
 	{
+		
 		$this->includeJS = false;
 		$this->albumsModel = new AlbumsModel();
 		$this->picturesModel = new PicturesModel();
@@ -142,10 +154,18 @@ class Picasso {
 			WP_PLUGIN_URL . '/picasso/fancybox/jquery.mousewheel-3.0.4.pack.js');
 		wp_register_script('picasso_script_2', 
 			WP_PLUGIN_URL . '/picasso/fancybox/jquery.fancybox-1.3.4.pack.js');
+			
+		wp_register_script('picasso_script_3', 
+			WP_PLUGIN_URL . '/picasso/js/jquery.fileupload.js');
+		wp_register_script('picasso_script_4', 
+			WP_PLUGIN_URL . '/picasso/js/jquery.fileupload-ui.js');
 
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-ui-core');
-
+		
+		wp_enqueue_script('picasso_script_3');
+		wp_enqueue_script('picasso_script_4');
+		
 		//Load styles
 		wp_register_style('picasso_style_1',
 			WP_PLUGIN_URL . '/picasso/style.css');
@@ -232,12 +252,18 @@ class Picasso {
 
 		add_meta_box('picasso-upload-picture', 'Upload Pictures', array(&$this, 'uploadPictureWidget'),
 			'admin_page_picasso-edit-album', 'normal', 'core'); 
+			
+		add_meta_box('picasso-upload-picture-dnd', 'Upload Pictures', array(&$this, 'uploadPictureWidgetDnd'),
+			'admin_page_picasso-edit-album', 'normal', 'core');			
 
 		add_meta_box('picasso-edit-pictures', 'Edit Pictures', array(&$this, 'editPicturesWidget'), 
 			'admin_page_picasso-edit-album', 'normal', 'core'); 
 
 		add_meta_box('picasso-album-information', 'Album', array(&$this, 'albumInformationWidget'), 
 			'admin_page_picasso-edit-album', 'side', 'core'); 
+			
+		add_meta_box('picasso-show-pictures', 'Pictures', array(&$this, 'showPicturesWidget'), 
+			'admin_page_picasso-edit-album', 'normal', 'core');
 
 	}  
 
@@ -247,14 +273,15 @@ class Picasso {
 	function install() 
 	{
 
-	global $wpdb;
+		global $wpdb;
 
 		$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}picasso_albums` (
 			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 			`name` VARCHAR( 255 ) NOT NULL ,
 			`cid` INT NOT NULL DEFAULT '0' ,
 			`uid` INT NOT NULL DEFAULT  '0' ,
-			`dir` VARCHAR ( 40 ) NOT NULL
+			`dir` VARCHAR ( 40 ) NOT NULL ,
+			`privacy` INT NOT NULL DEFAULT  '0'
 		) ENGINE = INNODB;";
 		$result = $wpdb->query($sql);
 
@@ -296,7 +323,7 @@ class Picasso {
 	function settingsPage() 
 	{
 
-	//load settings page view
+		//load settings page view
 
 	}
 
@@ -305,7 +332,6 @@ class Picasso {
 	*/  
 	function editAlbumPage()
 	{
-
 		global $screen_layout_columns;
 
 		if((integer)$_GET['id'] != $_GET['id']) {
@@ -334,6 +360,14 @@ class Picasso {
 		require_once('widgets/recent_uploads.php');
 	}
 
+	function showPicturesWidget($data)
+	{
+		extract($data);
+		$pictures = $this->picturesModel->getPictures($_GET['id']);
+		$album = $dir;
+		require_once('widgets/show_pictures.php');
+	}
+	
 	/**
 	*
 	*/  
@@ -341,8 +375,10 @@ class Picasso {
 	{
 
 		$album = $this->albumsModel->getAlbumById($_GET['id']);
+		$privacy = $album->privacy;
 		$album = $album->name;
 		require_once('widgets/edit_album.php');
+		
 	}
 
 	/**
@@ -351,17 +387,21 @@ class Picasso {
 	function editPicturesWidget($data)
 	{
 		extract($data);
-		$pictures = $this->picturesModel->getPictures($_GET['id']);
+		// $pictures = $this->picturesModel->getPictures($_GET['id']);
 		$album = $dir;
+		if(isset($_GET['pid'])) {
+			$picture = $this->picturesModel->getPicture($_GET['pid']);
+		}
 		require_once('widgets/edit_pictures.php');
 
 	}
 
 	function albumInformationWidget()
 	{
+		
 		$cover = $this->albumsModel->getAlbumCoverById($_GET['id']);
-		print_r($cover);
 		require_once('widgets/album_information.php');
+		
 	}
 
 	/**
@@ -376,6 +416,19 @@ class Picasso {
 		require_once('widgets/upload_picture.php');
 	}
 
+	/**
+	*
+	*/  
+	function uploadPictureWidgetDnd($data)
+	{		
+		global $current_user;
+		get_currentuserinfo();
+
+		extract($data);
+		require_once('widgets/upload_picture_dnd.php');
+	}
+	
+	
 	/**
 	*
 	*/  
@@ -411,52 +464,76 @@ class Picasso {
 		require_once('widgets/add_album.php');
 	}
 
+	function updatePictureAction()
+	{
+		$this->remove_magic_quotes();
+		
+		$data = array("description" => $_POST['description'], "id" => $_POST['id']);
+		
+		$this->picturesModel->updatePicture($data);
+
+		wp_redirect($_SERVER['HTTP_REFERER']);
+		
+		
+	}
 
 	/**
 	* $_POST['album'], $_FILES['name'], $_POST['aid']
 	*/  
 	function uploadPictureAction()
-	{
-
+	{	
 		global $current_user;
-		get_currentuserinfo();
 		
-		echo $current_user->ID;
-		die("HERE");
+		get_currentuserinfo();
+
+		$this->remove_magic_quotes();
+		
+		//echo $current_user->ID;
+	
+	    //@TODO - filename should be an md5 or sanatized
+	    //$file = wp_unique_filename($directory, $_FILES['file']['name']);
 		
 		//@TODO $_POST['dir'] should be escaped
 		$file = $this->fileHelper->upload($_POST['dir']);
 		
-
-		//@TODO - Is it more efficient to check if errors != 1 or the file === false?
-		//Upload error checking
-		if(ErrorHelper::getInstance()->getErrorCount() > 0) {
-			$perrors = &ErrorHelper::getInstance()->getErrors();
-			//@TODO: maybe there is a better way to show this??? meaning fewer new lines???
-			while(!empty($perrors)){
-				echo '<div id="message" class="error"><p>' .
-					array_pop($perrors) . '</p></div>'; 
-			}
-			return;
+		if($file === false) {
+			$error = &ErrorHelper::getInstance()->getErrors();
+			$output = array("status" => "ERROR", "data" => $error);
+			echo json_encode($output);
+			die();
 		}
 
 		$this->imageHelper->createThumbnail($file, $_POST['dir']);
-		$this->imageHelper->resize($file, $_POST['dir']);
+		//$this->imageHelper->resize($file, $_POST['dir']);
 
 
-		
+		//@TODO make uid dynamic
 		$data = array(
 			'filename' => $file,
 			'aid' => $_POST['aid'],
-			'uid' => $_POST['uid']
+			'uid' => 0
 		);
 
 		$picture = $this->picturesModel->addPicture($data);
 		if($picture === false) {
 			die("The picture was not inserted into the database");
 		}
+		
+		$info = pathinfo($file);
+		$t = $info['filename'] . "_thumb." . $info['extension'];
+		
+		//echo '{"name":"'.$current_user->ID.'","type":"'.$file['type'].'","size":"'.$file['size'].'"}';
+		$output = array(
+			"name" => $current_user->ID,
+			"type" => 'image/png',
+			"size" => 400,
+			"status" => "SUCCESS", 
+			"data" => PICASSO_UPLOAD_URL . "/" . $_POST['dir'] . "/" . $t, 
+			"filename" => $data['filename']);
+		echo json_encode($output);
 
-		//wp_redirect($_SERVER['HTTP_REFERER']);
+		die();
+		
 	}
 
 	/**
@@ -464,6 +541,8 @@ class Picasso {
 	*/
 	function deletePictureAction()
 	{
+		$this->remove_magic_quotes();
+		
 		if (!current_user_can('publish_pages'))
 			wp_die(__('Begone'));
 
@@ -485,6 +564,22 @@ class Picasso {
 
 		$this->picturesModel->deletePicture((integer)$_GET['id']);
 
+		$url = "?page=picasso-edit-album&id=" . $album->id;
+		wp_redirect($url);
+	}
+	
+	function updateAlbumAction()
+	{
+		global $current_user;
+		get_currentuserinfo();
+		$this->remove_magic_quotes();
+		
+		if (!current_user_can('publish_pages'))
+			wp_die(__('Begone'));
+			
+		$data = array('name' => $_POST['name'], 'id' => $_POST['id'], 'privacy' => $_POST['privacy']);
+		$this->albumsModel->updateAlbum($data);
+		
 		wp_redirect($_SERVER['HTTP_REFERER']);
 	}
 
@@ -493,9 +588,9 @@ class Picasso {
 	*/  
 	function saveAlbumAction() 
 	{
-
 		global $current_user;
 		get_currentuserinfo();
+		$this->remove_magic_quotes();
 		
 		if (!current_user_can('publish_pages'))
 			wp_die(__('Begone'));
@@ -518,7 +613,7 @@ class Picasso {
 			}
 		}
 
-	wp_redirect($_SERVER['HTTP_REFERER']);
+		wp_redirect($_SERVER['HTTP_REFERER']);
 
 	}
 
@@ -527,11 +622,14 @@ class Picasso {
 	*/  
 	function deleteAlbumAction() 
 	{
+		$this->remove_magic_quotes();
 
 		if (!current_user_can('publish_pages'))
 			wp_die(__('Begone'));
 
 		$this->albumsModel->deleteAlbum($_GET['album']);
+		//@TODO: Remove pictures from the database
+		$this->picturesModel->deletePicturesByAlbum($_GET['album']);
 
 		//@TODO: Remove the directory and pictures too?
 
@@ -545,7 +643,7 @@ class Picasso {
 	*/
 	function setAlbumCoverAction()
 	{
-
+		$this->remove_magic_quotes();
 		if (!current_user_can('publish_pages'))
 			wp_die(__('Begone'));
 
@@ -609,6 +707,16 @@ class Picasso {
 			$albums = $this->albumsModel->getAlbumCovers();
 			require_once('views/gallery.php');
 		}
+	}
+	
+	function remove_magic_quotes()
+	{
+		if (get_magic_quotes_gpc()) {
+		    $_POST      = array_map('stripslashes_deep', $_POST);
+		    $_GET       = array_map('stripslashes_deep', $_GET);
+		    $_COOKIE    = array_map('stripslashes_deep', $_COOKIE);
+		    $_REQUEST   = array_map('stripslashes_deep', $_REQUEST);
+		}		
 	}
 	
 }
