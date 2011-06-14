@@ -130,6 +130,7 @@ class Picasso {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('swfupload-all');
+    wp_enqueue_script('swfupload-handlers');
     wp_enqueue_script('picasso_script_1');
     wp_enqueue_script('picasso_script_2');
     
