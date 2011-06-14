@@ -77,10 +77,22 @@ add_action('admin_action_picasso-delete-album',
   array(&$picasso, 'deleteAlbumAction'));
 /**
 *
+*/    
+add_action('admin_action_picasso-delete-picture', 
+  array(&$picasso, 'deletePictureAction'));
+/**
+*
+*/    
+add_action('admin_action_picasso-set-album-cover', 
+  array(&$picasso, 'setAlbumCoverAction'));
+/**
+*
 */
 add_action('admin_post_picasso-upload-picture', 
   array(&$picasso, 'uploadPictureAction'));
-  
+/**
+*
+*/    
 add_action('admin_post_nopriv_picasso-upload-picture', 
   array(&$picasso, 'uploadPictureAction'));
 /**
@@ -202,29 +214,31 @@ class Picasso {
   
     add_meta_box('picasso-edit-album', 'Edit Album', array(&$this, 'editAlbumWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core');
-      
+
     add_meta_box('picasso-edit-pictures', 'Edit Pictures', array(&$this, 'editPicturesWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core'); 
 
     add_meta_box('picasso-upload-picture', 'Edit Pictures', array(&$this, 'uploadPictureWidget'),
       'admin_page_picasso-edit-album', 'normal', 'core'); 
-      
+
   }  
-  
+
   /**
   * Create necessary tables and add necessary options
   */
   function install() 
   {
-  
+
     global $wpdb;
-    
+
     $sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}picasso_albums` (
       `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-      `name` VARCHAR( 255 ) NOT NULL
+    	`name` VARCHAR( 255 ) NOT NULL ,
+  		`cid` INT NOT NULL DEFAULT '0' ,
+    	`uid` INT NOT NULL DEFAULT  '0'
       ) ENGINE = INNODB;";
     $result = $wpdb->query($sql);
-    
+
     $sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}picasso_pictures` (
       `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
       `aid` INT NOT NULL ,
@@ -233,67 +247,67 @@ class Picasso {
       INDEX (  `aid` )
       ) ENGINE = INNODB;";
     $result = $wpdb->query($sql);
-    
+
     add_option('PICASSO_DBVERSION', '1.0');
-    
+
   }
-  
-  
-  
-  
+
+
+
+
   /**
-  *
+  * Show dashboard page
   */  
   function dashboardPage() 
   {
-  
+
     global $screen_layout_columns;
     $data = array();
     $pagehook = "toplevel_page_picasso";
     require_once('template.php');
-    
+
   }
 
   /**
-  *
+  * Show settings page
   */	
   function settingsPage() 
   {
-  
+
     //load settings page view
-    
+
   }
 
   /**
-  *
+  * Show album specified by the album id $_GET['id']
   */  
   function editAlbumPage()
   {
-  
+
     global $screen_layout_columns;
-    
-    if((int)$_GET['id'] != $_GET['id']) {
+
+    if((integer)$_GET['id'] != $_GET['id']) {
       die('Invalid album id');
-    }    
-    
+    }
+
     $album = $this->albumsModel->getAlbumById((int)$_GET['id']);
     if($album == "") {
       die("That album does not exist");
     }
-    
+
     $data = array('album' => $album);
     $pagehook = "admin_page_picasso-edit-album";
-    require_once('template.php');  
-    
+    require_once('template.php');
+
   }
-  
-  
-  
-  
+
+
+
+
   /**
   *
   */  
-  function editAlbumWidget() 
+  function editAlbumWidget()
   {
     require_once('widgets/edit_album.php');
   }
@@ -301,19 +315,19 @@ class Picasso {
   /**
   *
   */  
-  function editPicturesWidget() 
+  function editPicturesWidget()
   {
-  
+
     $pictures = $this->picturesModel->getPictures($_GET['id']);
     $album = md5($this->albumsModel->getAlbumById($_GET['id']));
     require_once('widgets/edit_pictures.php');
-    
-  } 
+
+  }
 
   /**
   *
   */  
-  function uploadPictureWidget($data) 
+  function uploadPictureWidget($data)
   {
     extract($data);
     require_once('widgets/upload_picture.php');
@@ -334,11 +348,6 @@ class Picasso {
   */  
   function creditsWidget()
   {
-  	//$error = $this->errorHelper::getInstance();
-  	//$this->errorHelper->setError('This is a test');
-  	
-  	echo $this->errorHelper->getErrorCount();
-  	die();
     require_once('widgets/credits.php');
   }
 
@@ -354,14 +363,14 @@ class Picasso {
   /**
   *
   */  
-  function addAlbumWidget() 
+  function addAlbumWidget()
   {
     require_once('widgets/add_album.php');
   }
-  
-  
+
+
   /**
-  *
+  * $_POST['album'], $_FILES['name'], $_POST['aid']
   */  
   function uploadPictureAction()
   {
@@ -394,9 +403,25 @@ class Picasso {
     
     //wp_redirect($_SERVER['HTTP_REFERER']);
   }
+  
+  /**
+  * $_GET['id']
+  */
+  function deletePictureAction()
+  {
+    if (!current_user_can('publish_pages'))
+      wp_die(__('Begone'));
+      
+    if($_GET['id'] != (integer)$_GET['id']) 
+    	wp_die(__('Begone'));
+	  	
+	  $this->picturesModel->deletePicture((integer)$_GET['id']);
+      
+    wp_redirect($_SERVER['HTTP_REFERER']);
+  }
 
   /**
-  *
+  * $_POST['name']
   */  
   function saveAlbumAction() 
   {
@@ -420,7 +445,7 @@ class Picasso {
   }
   
   /**
-  *
+  * Delete the album specified by $_GET['album']
   */  
   function deleteAlbumAction() 
   {
@@ -433,49 +458,65 @@ class Picasso {
     
   }
   
+  /**
+  * Set the cover for the album with id $_GET['aid'] 
+  * to the picture with id $_GET['pid']
+  */
+  function setAlbumCoverAction()
+  {
+  	
+    if (!current_user_can('publish_pages'))
+      wp_die(__('Begone'));
+      
+    if($_GET['aid'] != (integer)$_GET['aid']) 
+    	wp_die(__('Begone'));
+
+    if($_GET['pid'] != (integer)$_GET['pid']) 
+    	wp_die(__('Begone'));
+        	
+  	$this->albumsModel->setAlbumCover($_GET['aid'], $_GET['pid']);
+    wp_redirect($_SERVER['HTTP_REFERER']);
+	  	
+  }
   
   
   
   
   
+  
+  /**
+  * [picasso] Display all albums in gallery format
+  * [picasso aid="1,2,3"] Display albums 1, 2, and 3 in gallery format
+	* [picasso aid="1"] Display album 1
+	*/
   function createGallery($atts)
   {
-    extract(shortcode_atts(array('id' => 0), $atts));
-    $album = $this->albumsModel->getAlbumById($id);
-    $album = md5($album);
-    $pictures = $this->picturesModel->getPictures($id);
+    extract(shortcode_atts(array('id' => null), $atts));
     
-    foreach($pictures as $picture) {    
-    	$info = pathinfo($picture->filename);
-    	$t = $info['filename'] . "_thumb." . $info['extension'];
-    	
-      echo "<a rel='example_group' href='" . PICASSO_UPLOAD_URL . "/$album/$picture->filename'>";
-      echo "<img src='" . PICASSO_UPLOAD_URL . "/$album/$t' /> ";
-      echo "</a>";
+    if(isset($_GET['id'])) {
+    	if($_GET['id'] == (integer)$_GET['id'])
+    		$id = (integer)$_GET['id'];
+    }
+
+		$albums = explode(",", $id);
+		
+    if(count($albums) > 1 && $id != null) {
+    	echo "Not supported. Sorry. :'(";
     }
     
-
-$str = <<<EOD
-    	<script type="text/javascript">
-		jQuery(document).ready(function() {
-
-
-			jQuery("a[rel=example_group]").fancybox({
-				'transitionIn'		: 'none',
-				'transitionOut'		: 'none',
-				'titlePosition' 	: 'over',
-				'titleFormat'		: function(title, currentArray, currentIndex, currentOpts) {
-					return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + (title.length ? ' &nbsp; ' + title : '') + '</span>';
-				}
-			});
-
-
-		});
-	</script>
-EOD;
-
-  echo $str;
-  
+    else if(count($albums) == 1 && $id != null) {
+    	$album = $this->albumsModel->getAlbumById($id);
+    	$album = md5($album);
+    	$pictures = $this->picturesModel->getPictures($id);
+    	require_once('views/album.php');
+    }
+    
+    else {
+    	$albums = $this->albumsModel->getAlbumCovers();
+    	require_once('views/gallery.php');
+    }
+    
+    
   }
 }
 
