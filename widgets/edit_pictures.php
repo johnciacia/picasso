@@ -4,10 +4,11 @@
   } else {
     foreach($pictures as $picture) {
     
-    	$a = explode(".", $picture->filename);
-    	$b = $a[0] . "_t." . $a[1];
+
+    	$info = pathinfo($picture->filename);
+    	$t = $info['filename'] . "_thumb." . $info['extension'];
     	
-      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/" . $b . "' /> ";
+      echo "<img src='" . PICASSO_UPLOAD_URL . "/$album/" . $t . "' /> ";
     
     }
   }

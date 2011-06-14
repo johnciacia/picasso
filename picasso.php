@@ -26,6 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
 
+define('PICASSO_UPLOAD_DIR', WP_CONTENT_DIR . '/uploads/picasso');
+define('PICASSO_UPLOAD_URL',  WP_CONTENT_URL . '/uploads/picasso');
+
 require_once('models/albums_model.php');
 require_once('models/pictures_model.php');
 require_once('helpers/file_helper.php');
@@ -426,9 +429,12 @@ class Picasso {
     $album = md5($album);
     $pictures = $this->picturesModel->getPictures($id);
     
-    foreach($pictures as $picture) {
-      echo "<a rel='example_group' href='" . WP_CONTENT_URL . "/uploads/picasso/$album/$picture->filename'>";
-      echo "<img src='" . WP_CONTENT_URL . "/uploads/picasso/$album/$picture->filename' width='100' height='100' style='width:100px;height:100px;' /> ";
+    foreach($pictures as $picture) {    
+    	$info = pathinfo($picture->filename);
+    	$t = $info['filename'] . "_thumb." . $info['extension'];
+    	
+      echo "<a rel='example_group' href='" . PICASSO_UPLOAD_URL . "/$album/$picture->filename'>";
+      echo "<img src='" . PICASSO_UPLOAD_URL . "/$album/$t' /> ";
       echo "</a>";
     }
     
