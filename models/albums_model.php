@@ -49,8 +49,8 @@ class AlbumsModel {
     
   	$sql = "SELECT * FROM `{$wpdb->prefix}picasso_albums` 
   		JOIN `{$wpdb->prefix}picasso_pictures` 
-  		WHERE {$wpdb->prefix}picasso_albums.cid = {$id}";
-			echo $sql;
+  		ON {$wpdb->prefix}picasso_albums.cid = {$wpdb->prefix}picasso_pictures.id
+			WHERE {$wpdb->prefix}picasso_albums.id = {$id}";
 	  	
 		return $wpdb->get_results($sql);			
 			
