@@ -1,3 +1,4 @@
+<!-- 
 <form action="admin-post.php" method="post" enctype="multipart/form-data">
   <label for="file">Filename:</label>
     <input type="file" name="file" id="file" /> 
@@ -6,8 +7,8 @@
     <input type="hidden" name="action" value="picasso-upload-picture" />    
     <input type="submit" class="button" name="submit" value="Upload" />
 </form>
+-->
 
-<!-- 
 <div id="swfupload-control">
 	<input type="button" id="flash-browse-button" />
 	<div id="media-items" class="hide-if-no-js"> </div>
@@ -64,4 +65,3 @@ SWFUpload.onload = function() {
 
 //]]>
 </script> 
--->

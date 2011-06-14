@@ -371,7 +371,7 @@ class Picasso {
       die("The picture was not inserted into the database");
     }
     
-    wp_redirect($_SERVER['HTTP_REFERER']);
+    //wp_redirect($_SERVER['HTTP_REFERER']);
   }
 
   /**

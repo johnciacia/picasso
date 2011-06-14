@@ -14,12 +14,10 @@ class FileHelper {
     
     //Is the MIME type valid?
     //wp_check_filetype()
-    if(!in_array($_FILES['file']['type'], $types)) {
-    	$file = getimagesize($_FILES['file']['type']);
-    	echo image_type_to_mime_type($file[2]);
-      die("<br />MIME type invalid");
-      return false;
-    }
+    //if(!in_array($_FILES['file']['type'], $types)) {
+    //  die("<br />MIME type invalid");
+    //  return false;
+    //}
      
     //Is the file size larger than the max size allowed by PHP?
     //@TODO - this is hackish. there has to be a better way to get the file size
