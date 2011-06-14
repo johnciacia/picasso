@@ -362,7 +362,7 @@ class Picasso {
     
     
     //@TODO - Create thumbnail
-    //$this->imageHelper->createThumbnail($file);
+    $this->imageHelper->createThumbnail($file, md5($_POST['album']));
     
     
     $data = array(
