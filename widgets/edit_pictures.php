@@ -36,7 +36,7 @@
 					<tr>
 						<td><p>Share To: </p></td>
 						<td>
-							<a href="http://www.facebook.com/sharer.php?u=<?php echo PICASSO_UPLOAD_URL . "/{$album}/{$picture->filename}"; ?>">Facebook</a>
+							<a href="http://www.facebook.com/sharer.php?u=<?php echo PICASSO_UPLOAD_URL . "/{$album}/{$picture->filename}"; ?>" onclick="window.open(this.href,'sharer','toolbar=0,status=0,width=626,height=436'); return false;">Facebook</a>
 							| Twitter</td>
 					</tr>
 
