@@ -400,9 +400,8 @@ class Picasso {
   */  
   function uploadPictureAction()
   {
-
     $file = $this->fileHelper->upload(md5($_POST['album']));
-    
+
     //@TODO - Is it more efficient to check if errors != 1 or the file === false?
     //Upload error checking
     if(ErrorHelper::getInstance()->getErrorCount() > 0) {
@@ -415,7 +414,6 @@ class Picasso {
       return;
     }
     
-    //@TODO - Create thumbnail
     $this->imageHelper->createThumbnail($file, md5($_POST['album']));
     
     
