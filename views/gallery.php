@@ -4,7 +4,7 @@
 		
 		$info = pathinfo($album->filename);
 		$t = $info['filename'] . "_thumb." . $info['extension'];
-		$s = md5($album->name);
+		$s = $album->dir;
     
     $query = explode('?', $_SERVER['REQUEST_URI']);
     $add = '?';

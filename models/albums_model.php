@@ -24,8 +24,8 @@ class AlbumsModel {
   {
     global $wpdb;
     
-    $sql = "SELECT `name` FROM `{$wpdb->prefix}picasso_albums` WHERE `id` = %d";
-    return $wpdb->get_var($wpdb->prepare($sql, $id));
+    $sql = "SELECT * FROM `{$wpdb->prefix}picasso_albums` WHERE `id` = %d";
+    return $wpdb->get_row($wpdb->prepare($sql, $id));
   }
   
   /**
@@ -68,8 +68,8 @@ class AlbumsModel {
     * Both $data columns and $data values should be "raw" (neither should be SQL escaped).
     */
     
-    $usedname = $wpdb->get_var("SELECT COUNT(*) FROM
-    `{$wpdb->prefix}picasso_albums` WHERE name='{$args['name']}'");
+		$usedname = $wpdb->get_var("SELECT COUNT(*) FROM
+			`{$wpdb->prefix}picasso_albums` WHERE name='{$args['name']}'");
     if($usedname > 0){
       ErrorHelper::getInstance()->setError("The album name already exists.");
       return false;
@@ -85,7 +85,7 @@ class AlbumsModel {
       return false;
     }
       
-    $data = array('name' => $args['name']);
+    $data = array('name' => $args['name'], 'dir' => $args['dir']);
     $wpdb->insert("{$wpdb->prefix}picasso_albums", (array) $data);  
     
     return $wpdb->insert_id;//returns false or the row id
