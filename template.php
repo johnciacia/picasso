@@ -2,12 +2,19 @@
   wp_nonce_field('picasso-general');
   wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false );
   wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false );
-
+  $perrors = get_option('PROPEL_ERROR');
+  ErrorHelper::getInstance()->clearAll();
 ?>
 
 <div id="picasso-general" class="wrap">
 <?php screen_icon('options-general'); ?>
-<h2>Picasso</h2>		
+<h2>Picasso</h2>	
+<?php 
+  while(!empty($perrors)){
+        echo "<div id=\"message\" class=\"error below-h2\"><p>".
+          array_pop($perrors) ."</p></div>";//neatly position the error
+  }
+?>	
   <div id="poststuff" class="metabox-holder<?php echo 2 == $screen_layout_columns ? ' has-right-sidebar' : ''; ?>">
     <div id="side-info-column" class="inner-sidebar">
       <?php do_meta_boxes($pagehook, 'side', $data); ?>

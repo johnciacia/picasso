@@ -49,6 +49,13 @@ class ErrorHelper {
     public function setError($error_text)
     {
         array_push(self::$error_array, $error_text);
+        update_option('PROPEL_ERROR', self::$error_array);
+    }
+    
+    public function clearAll()
+    {
+        self::$error_array = array();
+        update_option('PROPEL_ERROR', '');
     }
     
 }

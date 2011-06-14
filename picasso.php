@@ -265,6 +265,7 @@ class Picasso {
     $result = $wpdb->query($sql);
 
     add_option('PICASSO_DBVERSION', '1.0');
+    add_option('PICASSO_ERROR', '');
 
   }
 
@@ -407,8 +408,10 @@ class Picasso {
     if(ErrorHelper::getInstance()->getErrorCount() > 0) {
       $perrors = &ErrorHelper::getInstance()->getErrors();
       //@TODO: maybe there is a better way to show this??? meaning fewer new lines???
-      while(!empty($perrors))
-        echo "<div id=\"message\" class=\"error\"><br />".array_pop($perrors)."<br /><br /></div>";//neatly position the error
+      while(!empty($perrors)){
+        echo "<div id=\"message\" class=\"error\"><p>".
+          array_pop($perrors) ."</p></div>";//neatly position the error
+      }
       return;
     }
     
@@ -466,18 +469,24 @@ class Picasso {
   {
     if (!current_user_can('publish_pages'))
       wp_die(__('Begone'));
-    
-    $this->errorHelper->setError('This is a test');
       
     //check_admin_referer('picasso-general');
 
     $data = array('name' => $_POST['name']);
     
     //@TODO - more elegant error handling
-    $this->albumsModel->addAlbum($data);
+    $album_id = $this->albumsModel->addAlbum($data);
+    if ($album_id === false){
+        wp_redirect($_SERVER['HTTP_REFERER']);
+        exit;
+    }
     
-    if($this->fileHelper->createAlbum($_POST['name']) != true)
-      die("Cannot create the album.");
+    if($this->fileHelper->createAlbum($_POST['name']) != true){
+      //album directory wasn't created so remove the album
+      if($this->albumsModel->deleteAlbum($album_id) === false){
+        ErrorHelper::getInstance()->setError("Failure: clean incomplete album data in database.");
+      }
+    }
     
     wp_redirect($_SERVER['HTTP_REFERER']);
 		
