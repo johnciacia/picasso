@@ -34,10 +34,10 @@ class AlbumsModel {
   function getAlbumCovers()
 	{
     global $wpdb;
-    
+			
   	$sql = "SELECT * FROM `{$wpdb->prefix}picasso_albums` 
-  		JOIN `{$wpdb->prefix}picasso_pictures` 
-  		WHERE {$wpdb->prefix}picasso_albums.cid = {$wpdb->prefix}picasso_pictures.id";
+  		LEFT OUTER JOIN `{$wpdb->prefix}picasso_pictures` 
+  		ON {$wpdb->prefix}picasso_albums.cid = {$wpdb->prefix}picasso_pictures.id";
 	  	
 		return $wpdb->get_results($sql);
 	}
@@ -85,7 +85,7 @@ class AlbumsModel {
       return false;
     }
       
-    $data = array('name' => $args['name'], 'dir' => $args['dir']);
+    $data = array('name' => $args['name'], 'dir' => $args['dir'], 'uid' => $args['uid']);
     $wpdb->insert("{$wpdb->prefix}picasso_albums", (array) $data);  
     
     return $wpdb->insert_id;//returns false or the row id

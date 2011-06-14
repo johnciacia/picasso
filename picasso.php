@@ -115,7 +115,7 @@ class Picasso {
 	var $picturesModel;
 	var $fileHelper;
 	var $imageHelper;
-	var $errorHelper;
+	var $errorHelper;	
 	var $incldueJS;
 
 	/**
@@ -212,7 +212,10 @@ class Picasso {
 
 		add_meta_box('picasso-add-album', 'Add Album', array(&$this, 'addAlbumWidget'), 
 			'toplevel_page_picasso', 'normal', 'core');
-
+			
+		add_meta_box('picasso-recent-uploads', 'Recent Uploads', array(&$this, 'recentUploadsWidget'), 
+			'toplevel_page_picasso', 'normal', 'core');
+			
 		add_meta_box('picasso-credits', 'Credits', array(&$this, 'creditsWidget'), 
 			'toplevel_page_picasso', 'normal', 'core');
 
@@ -258,8 +261,10 @@ class Picasso {
 		$sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}picasso_pictures` (
 			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 			`aid` INT NOT NULL ,
+			`uid` INT NOT NULL DEFAULT  '0' ,
 			`filename` VARCHAR( 255 ) NOT NULL ,
 			`description` MEDIUMTEXT NOT NULL ,
+			`date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 			INDEX (  `aid` )
 		) ENGINE = INNODB;";
 		$result = $wpdb->query($sql);
@@ -324,7 +329,10 @@ class Picasso {
 	}
 
 
-
+	function recentUploadsWidget()
+	{
+		require_once('widgets/recent_uploads.php');
+	}
 
 	/**
 	*
@@ -360,7 +368,10 @@ class Picasso {
 	*
 	*/  
 	function uploadPictureWidget($data)
-	{
+	{		
+		global $current_user;
+		get_currentuserinfo();
+
 		extract($data);
 		require_once('widgets/upload_picture.php');
 	}
@@ -406,6 +417,13 @@ class Picasso {
 	*/  
 	function uploadPictureAction()
 	{
+
+		global $current_user;
+		get_currentuserinfo();
+		
+		echo $current_user->ID;
+		die("HERE");
+		
 		//@TODO $_POST['dir'] should be escaped
 		$file = $this->fileHelper->upload($_POST['dir']);
 		
@@ -419,15 +437,18 @@ class Picasso {
 				echo '<div id="message" class="error"><p>' .
 					array_pop($perrors) . '</p></div>'; 
 			}
-			eturn;
+			return;
 		}
 
 		$this->imageHelper->createThumbnail($file, $_POST['dir']);
 		$this->imageHelper->resize($file, $_POST['dir']);
 
+
+		
 		$data = array(
 			'filename' => $file,
-			'aid' => $_POST['aid']
+			'aid' => $_POST['aid'],
+			'uid' => $_POST['uid']
 		);
 
 		$picture = $this->picturesModel->addPicture($data);
@@ -472,12 +493,16 @@ class Picasso {
 	*/  
 	function saveAlbumAction() 
 	{
+
+		global $current_user;
+		get_currentuserinfo();
+		
 		if (!current_user_can('publish_pages'))
 			wp_die(__('Begone'));
 
 		//check_admin_referer('picasso-general');
 
-		$data = array('name' => $_POST['name'], 'dir' => md5(time()));
+		$data = array('name' => $_POST['name'], 'dir' => md5(time()), 'uid' => $current_user->ID);
 
 		//@TODO - more elegant error handling
 		$album_id = $this->albumsModel->addAlbum($data);

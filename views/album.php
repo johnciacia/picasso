@@ -6,7 +6,7 @@ foreach($pictures as $picture) {
 	$t = $info['filename'] . "_thumb." . $info['extension'];
 	
   echo "<a rel='picasso-album' href='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$picture->filename'>";
-  echo "<img class='thumb' src='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$t' /> ";
+  echo "<img class='thumb' src='" . PICASSO_UPLOAD_URL . "/{$album->dir}/$t' />";
   echo "</a>";
 }
 
@@ -15,8 +15,6 @@ foreach($pictures as $picture) {
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-
-
 		jQuery("a[rel=picasso-album]").fancybox({
 			'transitionIn'		: 'none',
 			'transitionOut'		: 'none',
