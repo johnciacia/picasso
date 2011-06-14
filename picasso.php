@@ -227,12 +227,13 @@ class Picasso {
   
     add_meta_box('picasso-edit-album', 'Edit Album', array(&$this, 'editAlbumWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core');
+			
+    add_meta_box('picasso-upload-picture', 'Edit Pictures', array(&$this, 'uploadPictureWidget'),
+      'admin_page_picasso-edit-album', 'normal', 'core'); 
 
     add_meta_box('picasso-edit-pictures', 'Edit Pictures', array(&$this, 'editPicturesWidget'), 
       'admin_page_picasso-edit-album', 'normal', 'core'); 
 
-    add_meta_box('picasso-upload-picture', 'Edit Pictures', array(&$this, 'uploadPictureWidget'),
-      'admin_page_picasso-edit-album', 'normal', 'core'); 
 
   }  
 
