@@ -98,6 +98,10 @@ add_action('admin_post_nopriv_picasso-upload-picture',
 /**
 *
 */  
+add_action('wp_footer', array(&$picasso, 'footerAction'));
+/**
+*
+*/  
 add_shortcode('picasso', array($picasso , 'createGallery'));
 
   
@@ -108,13 +112,14 @@ class Picasso {
   var $fileHelper;
   var $imageHelper;
   var $errorHelper;
+  var $incldueJS;
 
   /**
   * Create necessary models
   */
   function Picasso() 
   {
-  
+  	$this->includeJS = false;
     $this->albumsModel = new AlbumsModel();
     $this->picturesModel = new PicturesModel();
     $this->fileHelper = new FileHelper();
@@ -142,8 +147,6 @@ class Picasso {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('swfupload-all');
-    wp_enqueue_script('picasso_script_1');
-    wp_enqueue_script('picasso_script_2');
     
     //Load styles
     wp_register_style('picasso_style_1',
@@ -479,6 +482,14 @@ class Picasso {
 	  	
   }
   
+  function footerAction()
+  {
+  	if($this->includeJS == true) {
+	    wp_print_scripts('picasso_script_1');
+	    wp_print_scripts('picasso_script_2');
+  	}
+  }
+  
   
   
   
@@ -491,6 +502,8 @@ class Picasso {
 	*/
   function createGallery($atts)
   {
+  	$this->includeJS = true;
+  	
     extract(shortcode_atts(array('id' => null), $atts));
     
     if(isset($_GET['id'])) {
