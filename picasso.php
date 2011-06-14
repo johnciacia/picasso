@@ -29,6 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 require_once('models/albums_model.php');
 require_once('models/pictures_model.php');
 require_once('helpers/file_helper.php');
+require_once('helpers/image_helper.php');
 
 $picasso = new Picasso();
 
@@ -89,6 +90,7 @@ class Picasso {
   var $albumsModel;
   var $picturesModel;
   var $fileHelper;
+  var $imageHelper;
 
   /**
   * Create necessary models
@@ -99,6 +101,7 @@ class Picasso {
     $this->albumsModel = new AlbumsModel();
     $this->picturesModel = new PicturesModel();
     $this->fileHelper = new FileHelper();
+    $this->imageHelper = new ImageHelper();
     
   }
   
@@ -121,7 +124,6 @@ class Picasso {
     wp_enqueue_script('jquery');
     wp_enqueue_script('jquery-ui-core');
     wp_enqueue_script('swfupload-all');
-    //wp_enqueue_script('swfupload-handlers');
     wp_enqueue_script('picasso_script_1');
     wp_enqueue_script('picasso_script_2');
     
@@ -360,7 +362,9 @@ class Picasso {
     
     
     //@TODO - Create thumbnail
-    //$this->fileHelper->createThumbnail($file);
+    //$this->imageHelper->createThumbnail($file);
+    
+    
     $data = array(
       'filename' => $file,
       'aid' => $_POST['aid']
