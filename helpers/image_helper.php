@@ -8,7 +8,6 @@ class ImageHelper
 	
   function createThumbnail($filename, $album, $w = 150, $h = 150)
   {
-	
   	$image = PICASSO_UPLOAD_DIR . "/$album/$filename";
   	
     list($width, $height, $type) = getimagesize($image);
