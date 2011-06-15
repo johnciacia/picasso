@@ -15,7 +15,7 @@ If you are having issues with this plugin please submit a comment <a href="http:
 
 == Installation ==
 
-1. Download picass.zip and unzip it.
+1. Download picasso.zip and unzip it.
 2. Upload the plugin folder to wp-content/plugins/ and activate from the Plugin administrative menu.
 
 == Frequently Asked Questions ==
