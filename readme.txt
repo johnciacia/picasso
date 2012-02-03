@@ -1,9 +1,9 @@
 === Picasso - WordPress Albums ===
-Contributors: sidewindernet
+Contributors: johnciacia
 Tags: album, gallery
 Requires at least: 2.9
-Tested up to: 3.1.3
-Stable tag: 1.1.1
+Tested up to: 3.3.1
+Stable tag: 1.1.2
 
 This plugin allows users to create albums (gallery containers).
 

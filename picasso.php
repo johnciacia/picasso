@@ -1,10 +1,9 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 /*
 Plugin Name: Picsso - WordPress Albums
-Plugin URI: http://www.johnciacia.com/propel/
+Plugin URI: http://www.johnciacia.com/picasso/
 Description: Extend the WordPress gallery be adding support of albums.
-Version: 1.1.1
+Version: 1.1.2
 Author: John Ciacia
 Author URI: http://www.johnciacia.com
 
