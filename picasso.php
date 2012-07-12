@@ -3,7 +3,7 @@
 Plugin Name: Picsso - WordPress Albums
 Plugin URI: http://www.johnciacia.com/picasso/
 Description: Extend the WordPress gallery be adding support of albums.
-Version: 1.1.2
+Version: 1.1.3
 Author: John Ciacia
 Author URI: http://www.johnciacia.com
 
@@ -43,18 +43,18 @@ function picasso_album($atts) {
 	$instance++;
 
 	// Allow plugins/themes to override the default gallery template.
-	$output = apply_filters('post_album', '', $attr);
-	if ( $output != '' )
+	$output = apply_filters( 'post_album', '', $atts );
+	if( $output != '' )
 		return $output;
 
 	// We're trusting author input, so let's at least make sure it looks like a valid orderby statement
-	if ( isset( $attr['orderby'] ) ) {
-		$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
-		if ( !$attr['orderby'] )
-			unset( $attr['orderby'] );
+	if( isset( $atts['orderby'] ) ) {
+		$atts['orderby'] = sanitize_sql_orderby( $atts['orderby'] );
+		if ( !$atts['orderby'] )
+			unset( $atts['orderby'] );
 	}
 
-	extract(shortcode_atts(array(
+	extract(shortcode_atts( array(
 		'order'      => 'ASC',
 		'orderby'    => 'menu_order ID',
 		'id'         => $post->ID,
@@ -65,7 +65,7 @@ function picasso_album($atts) {
 		'size'       => 'thumbnail',
 		'include'    => '',
 		'exclude'    => ''
-	), $attr));
+	), $atts));
 
 
 	if ('RAND' == $order)
@@ -74,10 +74,10 @@ function picasso_album($atts) {
 
 
 	$defaults = array( 
-	    'post_parent' 	=> $id,
-	    'post_type'   	=> 'page', 
-	    'numberposts' 	=> -1,
-	    'post_status'	=> 'publish',
+		'post_parent' 	=> $id,
+		'post_type'   	=> 'page', 
+		'numberposts' 	=> -1,
+		'post_status'	=> 'publish',
 		'order' 		=> $order,
 		'oderby' 		=> $orderby
 	);

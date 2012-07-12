@@ -2,8 +2,8 @@
 Contributors: johnciacia
 Tags: album, gallery
 Requires at least: 2.9
-Tested up to: 3.3.1
-Stable tag: 1.1.2
+Tested up to: 3.4.1
+Stable tag: 1.1.3
 
 This plugin allows users to create albums (gallery containers).
 
